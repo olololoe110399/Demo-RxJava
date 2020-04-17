@@ -1,25 +1,14 @@
 package com.sun_asterisk.moviedb_50.data.model
 
-import org.json.JSONObject
+import com.google.gson.annotations.SerializedName
 
 data class Produce(
+    @SerializedName("id")
     val produceID: Int,
+    @SerializedName("logo_path")
     val produceLogo: String,
+    @SerializedName("name")
     val produceName: String,
+    @SerializedName("origin_country")
     val produceCountry: String
-) {
-    constructor(produceJson: JSONObject) : this(
-        produceID = produceJson.optInt(ProduceEntry.ID),
-        produceLogo = produceJson.optString(ProduceEntry.LOGO),
-        produceName = produceJson.optString(ProduceEntry.NAME),
-        produceCountry = produceJson.optString(ProduceEntry.COUNTRY)
-    )
-
-    object ProduceEntry {
-        const val PRODUCES = "production_companies"
-        const val ID = "id"
-        const val LOGO = "logo_path"
-        const val NAME = "name"
-        const val COUNTRY = "origin_country"
-    }
-}
+)
