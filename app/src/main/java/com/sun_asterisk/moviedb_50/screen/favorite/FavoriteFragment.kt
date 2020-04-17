@@ -12,11 +12,10 @@ import com.sun_asterisk.moviedb_50.R
 import com.sun_asterisk.moviedb_50.data.model.Favorite
 import com.sun_asterisk.moviedb_50.data.repository.MovieRepository
 import com.sun_asterisk.moviedb_50.data.source.local.MovieLocalDataSource
-import com.sun_asterisk.moviedb_50.data.source.local.dao.FavoritesDaoImpl
+import com.sun_asterisk.moviedb_50.data.source.local.MoviesDatabase
 import com.sun_asterisk.moviedb_50.data.source.remote.MovieRemoteDataSource
 import com.sun_asterisk.moviedb_50.screen.details.MovieDetailsFragment
 import com.sun_asterisk.moviedb_50.screen.favorite.adapter.FavoriteAdapter
-import com.sun_asterisk.moviedb_50.utils.Constant
 import com.sun_asterisk.moviedb_50.utils.FavoriteEnum
 import com.sun_asterisk.moviedb_50.utils.NetworkUtil
 import com.sun_asterisk.moviedb_50.utils.showSnackBar
@@ -32,7 +31,7 @@ class FavoriteFragment : Fragment(), FavoriteContract.View {
             val movieRepository: MovieRepository =
                 MovieRepository.getInstance(
                     MovieRemoteDataSource.getInstance(),
-                    MovieLocalDataSource.getInstance(FavoritesDaoImpl.getInstance(it))
+                    MovieLocalDataSource.getInstance(MoviesDatabase.getInstance(it).movieDao())
                 )
             presenter = FavoritePresenter(movieRepository)
         }
@@ -80,9 +79,9 @@ class FavoriteFragment : Fragment(), FavoriteContract.View {
         }
     }
 
-    override fun onError(exception: Exception?) {
-        exception?.let {
-            Toast.makeText(activity, it.message.toString(), Toast.LENGTH_LONG)
+    override fun onError(str: String?) {
+        str?.let {
+            Toast.makeText(activity, it, Toast.LENGTH_LONG)
                 .show()
         }
     }

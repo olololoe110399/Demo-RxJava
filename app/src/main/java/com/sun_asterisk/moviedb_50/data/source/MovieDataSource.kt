@@ -1,11 +1,13 @@
 package com.sun_asterisk.moviedb_50.data.source
 
+import androidx.databinding.ObservableArrayList
 import com.sun_asterisk.moviedb_50.data.model.Category
 import com.sun_asterisk.moviedb_50.data.model.Favorite
 import com.sun_asterisk.moviedb_50.data.model.Movie
 import com.sun_asterisk.moviedb_50.data.source.remote.OnDataLoadedCallback
 import com.sun_asterisk.moviedb_50.data.source.remote.response.GenresResponse
 import com.sun_asterisk.moviedb_50.data.source.remote.response.MoviesResponse
+import io.reactivex.Flowable
 import io.reactivex.Observable
 
 interface MovieDataSource {
@@ -13,11 +15,11 @@ interface MovieDataSource {
      * Local
      */
     interface Local {
-        fun getCategories(listener: OnDataLoadedCallback<List<Category>>)
-        fun getFavorites(listener: OnDataLoadedCallback<MutableList<Favorite>>)
-        fun addFavorite(favorite: Favorite, listener: OnDataLoadedCallback<Boolean>)
-        fun deleteFavorite(movieID: String, listener: OnDataLoadedCallback<Boolean>)
-        fun findFavoriteId(movieID: String, listener: OnDataLoadedCallback<Boolean>)
+        fun getCategories(): ObservableArrayList<Category>
+        fun getFavorites(): Flowable<MutableList<Favorite>>
+        fun addFavorite(favorite: Favorite)
+        fun deleteFavorite(movieID: String)
+        fun findFavoriteId(movieID: String):Flowable<Int>
     }
 
     /**

@@ -16,7 +16,7 @@ import com.sun_asterisk.moviedb_50.R
 import com.sun_asterisk.moviedb_50.data.model.Movie
 import com.sun_asterisk.moviedb_50.data.repository.MovieRepository
 import com.sun_asterisk.moviedb_50.data.source.local.MovieLocalDataSource
-import com.sun_asterisk.moviedb_50.data.source.local.dao.FavoritesDaoImpl
+import com.sun_asterisk.moviedb_50.data.source.local.MoviesDatabase
 import com.sun_asterisk.moviedb_50.data.source.remote.MovieRemoteDataSource
 import com.sun_asterisk.moviedb_50.screen.MainActivity
 import com.sun_asterisk.moviedb_50.screen.details.MovieDetailsFragment
@@ -41,7 +41,7 @@ class ListMovieFragment : Fragment(), ListMovieContract.View {
             val movieRepository: MovieRepository =
                 MovieRepository.getInstance(
                     MovieRemoteDataSource.getInstance(),
-                    MovieLocalDataSource.getInstance(FavoritesDaoImpl.getInstance(it))
+                    MovieLocalDataSource.getInstance(MoviesDatabase.getInstance(it).movieDao())
                 )
             presenter = ListMoviePresenter(movieRepository)
         }

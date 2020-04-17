@@ -25,16 +25,7 @@ class SearchPresenter(private val movieRepository: MovieRepository) : SearchCont
     }
 
     override fun getCategories() {
-        movieRepository.getCategories(object : OnDataLoadedCallback<List<Category>> {
-            override fun onSuccess(data: List<Category>?) {
-                data ?: return
-                view?.getCategoriesSuccess(data)
-            }
-
-            override fun onError(e: Exception) {
-                view?.onError(e.message.toString())
-            }
-        })
+        view?.getCategoriesSuccess(  movieRepository.getCategories())
     }
 
     override fun getMovies(type: String, query: String, page: Int) {
