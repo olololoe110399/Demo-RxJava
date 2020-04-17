@@ -35,7 +35,6 @@ abstract class BaseFilterAdapter<T : BaseFilterAdapter.Searchable, V : BaseViewH
     }
 
     fun removeData(position: Int) {
-        originItems.removeAt(position)
         items.removeAt(position)
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, itemCount)

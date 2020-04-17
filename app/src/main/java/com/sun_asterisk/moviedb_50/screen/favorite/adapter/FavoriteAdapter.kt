@@ -33,7 +33,7 @@ class FavoriteAdapter(originItems: MutableList<Favorite>) :
 
         override fun onBindData(itemData: Favorite) {
             super.onBindData(itemData)
-            itemData.moviePosterPath?.let { convertByteArrayToBitMap(itemData.moviePosterPath) }
+            itemData.moviePosterPath?.let { convertByteArrayToBitMap(it) }
             itemView.voteRatingBar.rating = itemData.movieVoteAverage.toFloat() * 0.5f
             itemView.titleTextView.text = itemData.movieTitle
             itemView.overviewTextView.text = itemData.movieOverView

@@ -2,8 +2,8 @@ package com.sun_asterisk.moviedb_50.screen.details
 
 import com.sun_asterisk.moviedb_50.data.model.Favorite
 import com.sun_asterisk.moviedb_50.data.repository.MovieRepository
-import com.sun_asterisk.moviedb_50.data.source.remote.OnDataLoadedCallback
 import com.sun_asterisk.moviedb_50.utils.FavoriteEnum
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -47,72 +47,61 @@ class MovieDetailsPresenter(private val movieRepository: MovieRepository) :
     }
 
     private fun isFavoriteMovie(movieID: String) {
-        movieRepository.findFavoriteId(movieID, object : OnDataLoadedCallback<Boolean> {
-            override fun onSuccess(data: Boolean?) {
-                data ?: return
+        val disposable: Disposable = movieRepository.findFavoriteId(movieID)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
+                view?.onLoading(true)
+            }
+            .subscribe({ data ->
                 view?.showFavoriteImage(
-                    if (data) FavoriteEnum.ADD_FAVORITE_SUCCESS
+                    if (data > 0) FavoriteEnum.ADD_FAVORITE_SUCCESS
                     else FavoriteEnum.DELETE_FAVORITE_SUCCESS
                 )
-            }
-
-            override fun onError(e: Exception) {
-                view?.onError(e.message.toString())
-            }
-
-        })
+            },
+                { throwable -> view?.onError(throwable.message.toString()) })
+        compositeDisposable.add(disposable)
     }
 
     override fun handleFavorites(favorite: Favorite) {
-        movieRepository.findFavoriteId(favorite.movieID, object : OnDataLoadedCallback<Boolean> {
-            override fun onSuccess(data: Boolean?) {
-                data ?: return
-                if (data) deleteFavorite(favorite.movieID) else addFavorite(favorite)
+        val disposable: Disposable = movieRepository.findFavoriteId(favorite.movieID)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
+                view?.onLoading(true)
             }
+            .subscribe({ data ->
+                if (data > 0) deleteFavorite(favorite)
+                else addFavorite(favorite)
+            },
+                { throwable -> view?.onError(throwable.message.toString()) })
+        compositeDisposable.add(disposable)
 
-            override fun onError(e: Exception) {
-                view?.onError(e.message.toString())
-            }
-        })
     }
 
     private fun addFavorite(favorite: Favorite) {
-        movieRepository.addFavorite(favorite, object : OnDataLoadedCallback<Boolean> {
-            override fun onSuccess(data: Boolean?) {
-                data ?: return
+        compositeDisposable.add(Observable.fromCallable { movieRepository.addFavorite(favorite) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
                 view?.run {
-                    if (data) {
-                        showFavoriteImage(FavoriteEnum.ADD_FAVORITE_SUCCESS)
-                        notifyFavorite(FavoriteEnum.ADD_FAVORITE_SUCCESS)
-                    } else {
-                        notifyFavorite(FavoriteEnum.ADD_FAVORITE_ERROR)
-                    }
+                    showFavoriteImage(FavoriteEnum.ADD_FAVORITE_SUCCESS)
+                    notifyFavorite(FavoriteEnum.ADD_FAVORITE_SUCCESS)
                 }
             }
-
-            override fun onError(e: Exception) {
-                view?.onError(e.message.toString())
-            }
-        })
+            .subscribe())
     }
 
-    private fun deleteFavorite(movieID: String) {
-        movieRepository.deleteFavorite(movieID, object : OnDataLoadedCallback<Boolean> {
-            override fun onSuccess(data: Boolean?) {
-                data ?: return
+    private fun deleteFavorite(favorite: Favorite) {
+        compositeDisposable.add(Observable.fromCallable { movieRepository.deleteFavorite(favorite) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
                 view?.run {
-                    if (data) {
-                        showFavoriteImage(FavoriteEnum.DELETE_FAVORITE_SUCCESS)
-                        notifyFavorite(FavoriteEnum.DELETE_FAVORITE_SUCCESS)
-                    } else {
-                        notifyFavorite(FavoriteEnum.DELETE_FAVORITE_ERROR)
-                    }
+                    showFavoriteImage(FavoriteEnum.DELETE_FAVORITE_SUCCESS)
+                    notifyFavorite(FavoriteEnum.DELETE_FAVORITE_SUCCESS)
                 }
             }
-
-            override fun onError(e: Exception) {
-                view?.onError(e.message.toString())
-            }
-        })
+            .subscribe())
     }
 }

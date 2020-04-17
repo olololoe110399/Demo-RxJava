@@ -1,8 +1,6 @@
 package com.sun_asterisk.moviedb_50.screen.search
 
-import com.sun_asterisk.moviedb_50.data.model.Category
 import com.sun_asterisk.moviedb_50.data.repository.MovieRepository
-import com.sun_asterisk.moviedb_50.data.source.remote.OnDataLoadedCallback
 import com.sun_asterisk.moviedb_50.utils.Constant
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -25,16 +23,14 @@ class SearchPresenter(private val movieRepository: MovieRepository) : SearchCont
     }
 
     override fun getCategories() {
-        movieRepository.getCategories(object : OnDataLoadedCallback<List<Category>> {
-            override fun onSuccess(data: List<Category>?) {
-                data ?: return
-                view?.getCategoriesSuccess(data)
-            }
-
-            override fun onError(e: Exception) {
-                view?.onError(e.message.toString())
-            }
-        })
+        val disposable: Disposable = movieRepository.getCategories()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ list ->
+                view?.getCategoriesSuccess(list)
+            },
+                { throwable -> view?.onError(throwable.message.toString()) })
+        compositeDisposable.add(disposable)
     }
 
     override fun getMovies(type: String, query: String, page: Int) {
