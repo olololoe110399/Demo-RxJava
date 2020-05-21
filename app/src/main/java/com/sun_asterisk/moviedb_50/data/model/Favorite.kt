@@ -1,15 +1,19 @@
 package com.sun_asterisk.moviedb_50.data.model
 
 import android.database.Cursor
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.sun_asterisk.moviedb_50.screen.base.BaseFilterAdapter
-
+@Entity(tableName = "tbl_movie")
 data class Favorite(
-    val movieID: String,
-    val movieTitle: String,
-    val movieOverView: String,
-    val moviePosterPath: ByteArray?,
-    val movieVoteAverage: String,
-    val movieReleaseDate: String
+    @ColumnInfo(name = "movie_id")
+    @PrimaryKey var movieID: String,
+    @ColumnInfo(name = "movie_title") var movieTitle: String,
+    @ColumnInfo(name = "movie_overview") var movieOverView: String,
+    @ColumnInfo(name = "movie_poster_path") var moviePosterPath: ByteArray?,
+    @ColumnInfo(name = "movie_vote_average") var movieVoteAverage: String,
+    @ColumnInfo(name = "movie_release_date") var movieReleaseDate: String
 ) : BaseFilterAdapter.Searchable {
     override fun getSearchCriteria(): String {
         return movieTitle

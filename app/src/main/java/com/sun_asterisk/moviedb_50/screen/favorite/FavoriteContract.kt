@@ -12,7 +12,7 @@ interface FavoriteContract {
         fun onGetFavoritesSuccess(favorites: MutableList<Favorite>)
         fun updateFavoritesAfterRemovingItem(position: Int)
         fun notifyDeleteFavorite(type: FavoriteEnum)
-        fun onError(exception: Exception?)
+        fun onError(str: String?)
         fun onLoading(isLoad: Boolean)
     }
 
@@ -21,6 +21,6 @@ interface FavoriteContract {
      */
     interface Presenter : BasePresenter<View?> {
         fun getFavorite()
-        fun deleteFavorite(position: Int, favoriteId: String)
+        fun deleteFavorite(position: Int, favorite: Favorite)
     }
 }
